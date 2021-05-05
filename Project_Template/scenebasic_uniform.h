@@ -25,9 +25,21 @@
 class SceneBasic_Uniform : public Scene
 {
 private:
+    //
     Plane plane;
+    //
     std::unique_ptr<ObjMesh>mesh;
+    std::unique_ptr<ObjMesh>mesh2;
+    //float angle;
+    //float time;
+   // void setMatrices();
+    //
     GLSLProgram prog, flatProg;
+    //
+    GLuint quad;
+    glm::vec3 lightPos;
+    //
+
     Random rand;
     glm::vec3 emitterPos, emitterDir;
     GLuint posBuf[2], velBuf[2], age[2];
@@ -42,10 +54,13 @@ private:
     void initBuffers();
     void setMatrices(GLSLProgram&);
     void compile();
+    //
+    void drawScene();
+    //
 public:
     SceneBasic_Uniform();
     void initScene();
-    void update( float t );
+    void update(float t);
     void render();
     void resize(int, int);
 };

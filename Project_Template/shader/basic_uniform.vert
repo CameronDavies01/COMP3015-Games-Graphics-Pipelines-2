@@ -108,7 +108,7 @@ Position = (ModelViewMatrix * vec4(VertexPosition,1.0)).xyz;
 //
 ShadowNormal = normalize(NormalMatrix * VertexNormal);
 ShadowCoord = ShadowMatrix * vec4(VertexPosition,1.0);
-//gl_Position = MVP = vec4(VertexPosition,1.0);
+//gl_Position = MVP * vec4(VertexPosition,1.0);
 //
 
 if(Pass == 1)
