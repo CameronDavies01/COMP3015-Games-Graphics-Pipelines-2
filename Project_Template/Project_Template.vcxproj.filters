@@ -90,6 +90,8 @@
     <None Include="shader\solid.fs" />
     <None Include="shader\Noise_Shader.frag" />
     <None Include="shader\Noise_Shader.vert" />
+    <None Include="shader\Moss.frag" />
+    <None Include="shader\Moss.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\scene.h">
@@ -167,6 +169,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="media\texture\CokeDrink.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="media\texture\Exit.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="media\texture\Exit.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

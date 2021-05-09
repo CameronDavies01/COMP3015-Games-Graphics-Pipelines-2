@@ -30,10 +30,9 @@ void SceneBasic_Uniform::initScene()
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
     glEnable(GL_BLEND);
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
 
-    //
     projection = mat4(1.0f);
     GLfloat verts[] = {
         -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
@@ -67,24 +66,22 @@ void SceneBasic_Uniform::initScene()
     glBindVertexArray(0);
 
     prog.setUniform("NoiseTex", 0);
-    flatProg.setUniform("NoiseTex", 0);
 
     GLuint noiseTex = NoiseTex::generate2DTex(6.0f);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, noiseTex);
-    //
 
     model = mat4(1.0f);
 
     glActiveTexture(GL_TEXTURE0);
     Texture::loadTexture("../Project_Template/media/texture/Disco.jpg");
 
-
     glActiveTexture(GL_TEXTURE1);
     ParticleUtils::createRandomTex1D(nParticles * 3);
 
     initBuffers();
 
+    // Shader Spin
     prog.use();
     prog.setUniform("RandomTex", 1);
     prog.setUniform("ParticleTex", 0);
@@ -93,12 +90,12 @@ void SceneBasic_Uniform::initScene()
     prog.setUniform("ParticleSize", 0.05f);
     prog.setUniform("EmitterPos", emitterPos);
     prog.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
-    //
     prog.setUniform("Light.Intensity", vec3(1.0f, 1.0f, 1.0f));
     angle = glm::root_half_pi<float>();
-    //
 
+    // Shader 2
     flatProg.use();
+    flatProg.setUniform("NoiseTex", 0);
     flatProg.setUniform("RandomTex", 2);
     flatProg.setUniform("ParticleTex", 0);
     flatProg.setUniform("ParticleLifetime", particleLifetime);
@@ -108,6 +105,22 @@ void SceneBasic_Uniform::initScene()
     flatProg.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
     flatProg.setUniform("Light.Intensity", vec3(1.0f, 1.0f, 1.0f));
 
+    //Moss Shader
+    MossProg.use();
+    MossProg.setUniform("lights[0].Position", vec3(1.0f, 1.0f, 1.0f));
+    MossProg.setUniform("lights[1].La", vec3(1.0f, 1.0f, 1.0f));
+    MossProg.setUniform("lights[2].L", vec3(1.0f, 1.0f, 1.0f));
+    // MOSS
+    float x, z;
+    for (int i = 0; i < 3; i++)
+    {
+        std::stringstream name;
+        name << "lights[" << i << "].Position";
+        x = 2.0f * cosf((glm::two_pi<float>() / 3) * i);
+        z = 2.0f * sinf((glm::two_pi<float>() / 3) * i);
+        prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 1.0f));
+    }
+    // MOSS
 }
 
 void SceneBasic_Uniform::initBuffers()
@@ -189,8 +202,8 @@ void SceneBasic_Uniform::initBuffers()
 void SceneBasic_Uniform::compile()
 {
     try {
-            prog.compileShader("shader/basic_uniform.vert");
-            prog.compileShader("shader/basic_uniform.frag");
+        prog.compileShader("shader/basic_uniform.vert");
+        prog.compileShader("shader/basic_uniform.frag");
 
         GLuint progHandle = prog.getHandle();
         const char* outputNames[] = { "Position", "Velocity", "Age" };
@@ -201,12 +214,12 @@ void SceneBasic_Uniform::compile()
 
         flatProg.compileShader("shader/Noise_Shader.frag");
         flatProg.compileShader("shader/Noise_Shader.vert");
-        //flatProg.compileShader("shader/flat_frag.glsl");
-        //flatProg.compileShader("shader/flat_vert.glsl");
         flatProg.link();
-        flatProg.use();
 
-
+        MossProg.compileShader("shader/Moss.frag");
+        MossProg.compileShader("shader/Moss.vert");
+        MossProg.link();
+        MossProg.use();
     }
     catch (GLSLProgramException& e) {
         cerr << e.what() << endl;
@@ -225,10 +238,8 @@ void SceneBasic_Uniform::render()
 {
     model = mat4(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //prog.link();
-    //prog.use();
-    //setMatrices(flatProg);
-    //grid.render();
+    flatProg.use();
+    setMatrices(flatProg);
 
     prog.use();
     prog.setUniform("Time", time);
@@ -252,15 +263,24 @@ void SceneBasic_Uniform::render()
 
     prog.setUniform("Pass", 2);
     view = glm::lookAt(vec3(4.0f * cos(angle), 1.5f, 4.0f * sin(angle)), vec3(0.0f, 1.5f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-    //
+
     projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
     prog.setUniform("Material.kd", 0.2f, 0.5f, 0.9f);
     prog.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
     prog.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
     prog.setUniform("Material.Shininess", 100.0f);
-    //
 
-    //
+    flatProg.setUniform("Material.kd", 0.2f, 0.5f, 0.9f);
+    flatProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
+    flatProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
+    flatProg.setUniform("Material.Shininess", 100.0f);
+
+    MossProg.setUniform("Material.kd", 0.2f, 0.5f, 0.9f);
+    MossProg.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
+    MossProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
+    MossProg.setUniform("Material.Shininess", 100.0f);
+
+    // Mesh 1
     glActiveTexture(GL_TEXTURE0);
     Texture::loadTexture("../Project_Template/media/texture/Disco.jpg");
     prog.link();
@@ -269,51 +289,61 @@ void SceneBasic_Uniform::render()
     model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
     setMatrices(prog);
     mesh->render();
-    //
 
-    //
+    // Plane
+    glActiveTexture(GL_TEXTURE0);
+    Texture::loadTexture("../Project_Template/media/texture/Laser.jpg");
     flatProg.link();
     flatProg.use();
     model = mat4(1.0f);
-    model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, vec3(1.0f, -1.0f, 1.0f));
     setMatrices(flatProg);
-    mesh2->render();
-    //
+    plane.render();
 
-    //
+    // Mesh 2
+    GLuint texture1 = Texture::loadTexture("../Project_Template/media/texture/Eye.jpg");
+    GLuint texture2 = Texture::loadTexture("../Project_Template/media/texture/Energy.png");
+    prog.link();
+    prog.use();
+    glBindTexture(GL_TEXTURE_2D, texture1);
     glActiveTexture(GL_TEXTURE0);
-    Texture::loadTexture("../Project_Template/media/texture/Chocolate.jpg");
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    glActiveTexture(GL_TEXTURE1);
+    model = mat4(1.0f);
+    model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices(prog);
+    mesh2->render();
+
+    // Particles
+    glActiveTexture(GL_TEXTURE0);
+    Texture::loadTexture("../Project_Template/media/texture/star.png");
     prog.link();
     prog.use();
     model = mat4(1.0f);
     model = glm::rotate(model, glm::radians(-10.0f), vec3(0.0f, 0.0f, 1.0f));
     model - glm::rotate(model, glm::radians(50.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices(prog);
-    //
 
-    //
-    flatProg.link();
-    flatProg.use();
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
-    setMatrices(prog);
-    plane.render();
-    //
 
-    setMatrices(prog);
     glDepthMask(GL_FALSE);
     glBindVertexArray(particleArray[drawBuf]);
     glVertexAttribDivisor(0, 1);
     glVertexAttribDivisor(1, 1);
     glVertexAttribDivisor(2, 1);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, nParticles);
+    glActiveTexture(GL_TEXTURE0);
+
+    // Sign
+    Texture::loadTexture("../Project_Template/media/texture/Exit.jpg");
+    prog.link();
+    prog.use();
+    model = mat4(1.0f);
+    setMatrices(prog);
     glBindVertexArray(0);
     glDepthMask(GL_TRUE);
-
-    //
     glBindVertexArray(quad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    //
+
 
     drawBuf = 1 - drawBuf;
 }
@@ -331,14 +361,15 @@ void SceneBasic_Uniform::setMatrices(GLSLProgram& p)
     mat4 mv = view * model;
     p.setUniform("MV", mv);
     p.setUniform("Proj", projection);
-    //
     prog.setUniform("ModelViewMatrix", mv);
     prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
     prog.setUniform("MVP", projection * mv);
     flatProg.setUniform("ModelViewMatrix", mv);
     flatProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
     flatProg.setUniform("MVP", projection * mv);
-    //
+    MossProg.setUniform("ModelViewMatrix", mv);
+    MossProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    MossProg.setUniform("MVP", (mat4(projection) * mv));
 }
 
 void SceneBasic_Uniform::resize(int w, int h)

@@ -30,11 +30,9 @@ private:
     //
     std::unique_ptr<ObjMesh>mesh;
     std::unique_ptr<ObjMesh>mesh2;
-    //float angle;
-    //float time;
-   // void setMatrices();
+
     //
-    GLSLProgram prog, flatProg;
+    GLSLProgram prog, flatProg, MossProg;
     //
     GLuint quad;
     glm::vec3 lightPos;
