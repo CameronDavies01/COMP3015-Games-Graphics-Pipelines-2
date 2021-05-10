@@ -166,6 +166,8 @@
     <None Include="shader\basic_uniform.frag" />
     <None Include="shader\basic_uniform.vert" />
     <None Include="shader\BlankShader.glsl" />
+    <None Include="shader\Cloud_Shader.frag" />
+    <None Include="shader\Cloud_Shader.vert" />
     <None Include="shader\flat_frag.glsl" />
     <None Include="shader\flat_vert.glsl" />
     <None Include="shader\Moss.frag" />
