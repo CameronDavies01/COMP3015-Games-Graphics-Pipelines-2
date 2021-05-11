@@ -40,15 +40,12 @@ spec = Material.Ks * pow( max( dot(h,n), 0.0 ), Material.Shininess );
 }
 return ambient + lights[2].L * (diffuse + spec);
 }
-//
+
 uniform sampler2D ParticleTex;
 
 layout (location = 0) out vec4 FragColor;
 void main()
 {
 FragColor = texture(ParticleTex, TexCoord);
-//
-//FragColor = vec4(blinnPhong(Position, normalize(Normal)), 1);
-//
 FragColor.a *= Transp;
 }

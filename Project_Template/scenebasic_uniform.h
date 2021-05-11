@@ -34,7 +34,7 @@ private:
     std::unique_ptr<ObjMesh>mesh4;
     std::unique_ptr<ObjMesh>mesh5;
     //
-    GLSLProgram prog, flatProg, MossProg, CloudProg;
+    GLSLProgram prog, flatProg;
     //
     GLuint quad;
     glm::vec3 lightPos;
