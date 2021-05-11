@@ -1,7 +1,7 @@
 #version 460
 in float Transp;
 in vec2 TexCoord;
-//
+
 in vec3 Position;
 in vec3 Normal;
 layout(binding=0) uniform sampler2D Tex1;
@@ -11,18 +11,26 @@ uniform vec3 f;
 out vec3 LightIntensity;
 
 uniform struct LightInfo {
+  // Light position in the eye coordinates
   vec4 LightPosition; 
+    // Ambient light intensity
   vec3 La;
+    // Diffuse and specular light intensity
   vec3 L; 
  } lights[3];
 
  uniform struct MaterialInfo {
+  // Ambient reflectivity
 vec3 Ka;
+ // Diffuse reflectivity
  vec3 Kd; 
+  // Specular reflectivity
  vec3 Ks; 
+  // Specular shininess
  float Shininess; 
 } Material;
 
+//blinnPhong shader
 vec3 blinnPhong(vec3 position, vec3 n ) {
 vec4 texColor1 = texture(Tex1, TexCoord);
 vec4 texColor2 = texture(Tex2, TexCoord);
@@ -40,15 +48,13 @@ spec = Material.Ks * pow( max( dot(h,n), 0.0 ), Material.Shininess );
 }
 return ambient + lights[2].L * (diffuse + spec);
 }
-//
+
 uniform sampler2D ParticleTex;
 
 layout (location = 0) out vec4 FragColor;
 void main()
 {
+// FragColor
 FragColor = texture(ParticleTex, TexCoord);
-//
-//FragColor = vec4(blinnPhong(Position, normalize(Normal)), 1);
-//
 FragColor.a *= Transp;
 }

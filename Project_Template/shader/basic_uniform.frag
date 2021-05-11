@@ -5,6 +5,7 @@ in vec2 TexCoord;
 in vec3 Position;
 in vec3 Normal;
 
+// Light
 uniform struct LightInfo {
   vec4 LightPosition; 
   vec3 La;
@@ -12,6 +13,7 @@ uniform struct LightInfo {
   vec3 Intensity;
  } Light;
 
+ // Material
  uniform struct MaterialInfo {
 vec3 Ka;
  vec3 Kd; 
@@ -19,12 +21,12 @@ vec3 Ka;
  float Shininess; 
 } Material;
 
-//uniform sampler2DShadow ShadowMap;
-
+// New Frag colour (where most shader informaiton is)
 layout (location = 1) out vec4 NewFragColor;
+// Frag Color helps it look a little bit better when layered with NewFragColor
 layout (location = 0) out vec4 FragColor;
 
-//phongModelDiffAndSpec might have to get rid of blinnPhong
+//phongModelDiffAndSpec
 vec3 phongModelDiffAndSpec()
 {
 vec3 n = Normal;
@@ -49,6 +51,7 @@ vec3 ambient = Light.Intensity * Material.Ka;
 vec3 diffAndSpec = phongModelDiffAndSpec();
 float shadow = 1.0;
 
+// NewFragColor
 NewFragColor = vec4(diffAndSpec * shadow + ambient, 1.0);
 NewFragColor = pow(NewFragColor, vec4(1.0 / 2.2));
 }
@@ -61,6 +64,8 @@ uniform sampler2D ParticleTex;
 
 void main()
 {
+// FragColor
 FragColor = texture(ParticleTex, TexCoord);
+// Allows both FragColor and NewFragColor to be passed
 RenderPass();
 }

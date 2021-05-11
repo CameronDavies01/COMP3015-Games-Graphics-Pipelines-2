@@ -7,7 +7,6 @@
 #include <string>
 #include "helper/glutils.h"
 #include "helper/noisetex.h"
-//#include <stdlib.h>
 #include <ctime>
 
 using std::cerr;
@@ -31,6 +30,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() : plane(13.0f, 10.0f, 200, 2), angle(0.
     mesh5 = ObjMesh::load("../Project_Template/media/Sign.obj", true);
 }
 
+// Initialises scene
 void SceneBasic_Uniform::initScene()
 {
     compile();
@@ -87,15 +87,19 @@ void SceneBasic_Uniform::initScene()
     prog.use();
     prog.setUniform("RandomTex", 1);
     prog.setUniform("ParticleTex", 0);
+    // Particle lifetime
     prog.setUniform("ParticleLifetime", particleLifetime);
+    // Particle accelleration
     prog.setUniform("Accel", vec3(0.0f, -0.5, 0.0f));
+    // Size of particles, also messes with all that uses then spin shader
     prog.setUniform("ParticleSize", 0.05f);
+    // Position of emitter
     prog.setUniform("EmitterPos", emitterPos);
     prog.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
     prog.setUniform("Light.Intensity", vec3(1.0f, 1.0f, 1.0f));
     angle = glm::root_half_pi<float>();
 
-    //Jutter Shader Jutters Textures
+    //Jutter Shader Jitters Textures
     flatProg.use();
     flatProg.setUniform("RandomTex", 2);
     flatProg.setUniform("ParticleTex", 0);
@@ -105,16 +109,16 @@ void SceneBasic_Uniform::initScene()
     flatProg.setUniform("EmitterPos", emitterPos);
     flatProg.setUniform("EmitterBasis", ParticleUtils::makeArbitraryBasis(emitterDir));
     flatProg.setUniform("Light.Intensity", vec3(1.0f, 1.0f, 1.0f));
-
-
 }
 
+// Initialises buffers
 void SceneBasic_Uniform::initBuffers()
 {
     glGenBuffers(2, posBuf);
     glGenBuffers(2, velBuf);
     glGenBuffers(2, age);
 
+    // Establishes and binds buffers
     int size = nParticles * 3 * sizeof(GLfloat);
     glBindBuffer(GL_ARRAY_BUFFER, posBuf[0]);
     glBufferData(GL_ARRAY_BUFFER, size, 0, GL_DYNAMIC_COPY);
@@ -182,13 +186,13 @@ void SceneBasic_Uniform::initBuffers()
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 2, age[1]);
 
     glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, 0);
-
 }
 
 // Compiles Shaders
 void SceneBasic_Uniform::compile()
 {
     try {
+        // Compile spin shader
         prog.compileShader("shader/basic_uniform.vert");
         prog.compileShader("shader/basic_uniform.frag");
         GLuint progHandle = prog.getHandle();
@@ -196,6 +200,7 @@ void SceneBasic_Uniform::compile()
         glTransformFeedbackVaryings(progHandle, 3, outputNames, GL_SEPARATE_ATTRIBS);
         prog.link();
 
+        // Compile jitter shader
         flatProg.compileShader("shader/Noise_Shader.frag");
         flatProg.compileShader("shader/Noise_Shader.vert");
         flatProg.link();
@@ -214,7 +219,7 @@ void SceneBasic_Uniform::update(float t)
     angle = std::fmod(angle + 0.01f, glm::two_pi<float>());
 }
 
-// Renders
+// Renders everything
 void SceneBasic_Uniform::render()
 {
     model = mat4(1.0f);
@@ -246,6 +251,7 @@ void SceneBasic_Uniform::render()
     view = glm::lookAt(vec3(4.0f * cos(angle), 1.5f, 4.0f * sin(angle)), vec3(0.0f, 1.5f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
+    // Sets uniform for both shaders
     prog.setUniform("Material.kd", 0.2f, 0.5f, 0.9f);
     prog.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
     prog.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
@@ -256,7 +262,6 @@ void SceneBasic_Uniform::render()
     flatProg.setUniform("Material.Ka", 0.2f, 0.5f, 0.9f);
     flatProg.setUniform("Material.Shininess", 100.0f);
 
-    // Cloud Sign
     view = glm::translate(view, glm::vec3(0.0f, 3.0f, 0.0f));
     // Amount of Clouds
     GLuint noiseTex = NoiseTex::generate2DTex(5.0f);
@@ -351,10 +356,10 @@ void SceneBasic_Uniform::render()
     glBindVertexArray(quad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
-
     drawBuf = 1 - drawBuf;
 }
 
+// Draw scene
 void SceneBasic_Uniform::drawScene()
 {
     model = mat4(1.0f);
@@ -363,6 +368,7 @@ void SceneBasic_Uniform::drawScene()
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+// Set matrices
 void SceneBasic_Uniform::setMatrices(GLSLProgram& p)
 {
     mat4 mv = view * model;
@@ -373,7 +379,7 @@ void SceneBasic_Uniform::setMatrices(GLSLProgram& p)
     prog.setUniform("ModelViewMatrix", mv);
     prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
     prog.setUniform("MVP", projection * mv);
-    // Jutter Shader
+    // Jitter Shader
     flatProg.setUniform("ModelViewMatrix", mv);
     flatProg.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
     flatProg.setUniform("MVP", projection * mv);

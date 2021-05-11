@@ -6,7 +6,6 @@ uniform vec4 Color;
 uniform sampler2D NoiseTex;
 uniform vec4 SkyColor = vec4(0.9, 0.9, 0.9, 1.0);
 uniform vec4 CloudColor = vec4(10.0, 1.0, 1.0, 1.0);
-
 in vec2 TexCoord;
 
 layout (location = 0) out vec4 FragColor;

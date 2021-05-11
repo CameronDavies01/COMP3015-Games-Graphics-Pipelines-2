@@ -25,20 +25,17 @@
 class SceneBasic_Uniform : public Scene
 {
 private:
-    //
     Plane plane;
-    //
     std::unique_ptr<ObjMesh>mesh;
     std::unique_ptr<ObjMesh>mesh2;
     std::unique_ptr<ObjMesh>mesh3;
     std::unique_ptr<ObjMesh>mesh4;
     std::unique_ptr<ObjMesh>mesh5;
-    //
+
     GLSLProgram prog, flatProg;
-    //
+
     GLuint quad;
     glm::vec3 lightPos;
-    //
 
     Random rand;
     glm::vec3 emitterPos, emitterDir;
@@ -54,9 +51,7 @@ private:
     void initBuffers();
     void setMatrices(GLSLProgram&);
     void compile();
-    //
     void drawScene();
-    //
 public:
     SceneBasic_Uniform();
     void initScene();

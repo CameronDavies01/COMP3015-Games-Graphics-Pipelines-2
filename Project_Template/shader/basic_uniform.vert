@@ -1,6 +1,6 @@
 ﻿#version 460
 
-const float PI = 3.14159265359;
+const float NUM = 1.23456789;
 
 layout (location = 0) in vec3 VertexPosition;
 layout (location = 1) in vec3 VertexVelocity;
@@ -53,8 +53,8 @@ const vec3 offsets[] = vec3[](vec3(-0.5,-0.5,0), vec3(0.5,-0.5,0), vec3(0.5,0.5,
 const vec2 texCoords[] = vec2[](vec2(0,0), vec2(1,0), vec2(1,1), vec2(0,0), vec2(1,1), vec2(0,1));
 
 vec3 randomInitialVelocity(){
-float theta = mix(0.0, PI / 8.0, texelFetch(RandomTex, 3 * gl_VertexID, 0).r);
-float phi = mix(0.0, 2.0 * PI, texelFetch(RandomTex, 3 * gl_VertexID + 1, 0).r);
+float theta = mix(0.0, NUM / 8.0, texelFetch(RandomTex, 3 * gl_VertexID, 0).r);
+float phi = mix(0.0, 2.0 * NUM, texelFetch(RandomTex, 3 * gl_VertexID + 1, 0).r);
 float velocity = mix(1.25, 1.5, texelFetch(RandomTex, 3 * gl_VertexID + 2, 0).r);
 vec3 v = vec3(sin(theta) * cos(phi), cos(theta), sin(theta) * sin(phi));
 return normalize(EmitterBasis * v) * velocity;
