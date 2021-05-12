@@ -1,5 +1,7 @@
 #version 460
 
+//// Whilst I refer to it as the spinning shader that’s only an optical illusion on the fountain, in reality the texture is moving backwards which can be seen clearer on the orb.
+
 in vec2 TexCoord;
 
 in vec3 Position;

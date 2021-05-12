@@ -298,6 +298,7 @@ void SceneBasic_Uniform::render()
     GLuint texture2 = Texture::loadTexture("../Project_Template/media/texture/Energy.png");
     prog.link();
     prog.use();
+    //Binds texture2 which is the transparent energy png
     glBindTexture(GL_TEXTURE_2D, texture2);
     glActiveTexture(GL_TEXTURE1);
     model = mat4(1.0f);

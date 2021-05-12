@@ -55,6 +55,7 @@ layout (location = 0) out vec4 FragColor;
 void main()
 {
 // FragColor
+// FragColor is what it looks like without he surface animation and FragColor.a is what it looks like in areas that have the surface animation applied
 FragColor = texture(ParticleTex, TexCoord);
 FragColor.a *= Transp;
 }

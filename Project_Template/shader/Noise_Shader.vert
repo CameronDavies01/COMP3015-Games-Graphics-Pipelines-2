@@ -2,18 +2,27 @@
 
 const float PI = 3.14159265359;
 
+// Vertex Position
 layout (location = 0) in vec3 VertexPosition;
+// Vertex Velocity
 layout (location = 1) in vec3 VertexVelocity;
+// Vertex Age
 layout (location = 2) in float VertexAge;
+// Animated Vertex Position
 layout (location = 0) in vec3 AnimVertexPosition;
+// Vertex Normal
 layout (location = 1) in vec3 VertexNormal;
+// Vertex Texture Coordinates
 layout (location = 2) in vec2 VertexTexCoord;
 
 out vec4 AnimPosition;
 out vec3 Normal;
 
+// Frequency of animation, the higher the number the more the texture will move around the model
 uniform float Freq = 2.5;
+// Can be summed up as the speed of the texture moving around the object
 uniform float AnimVelocity = 2.5;
+// Increases the appearance of distortion
 uniform float Amp = 0.6;
 
 uniform mat4 ModelViewMatrix;
@@ -76,20 +85,30 @@ if(VertexAge >= 0.0) {
 posCam = (MV * vec4(VertexPosition,1)).xyz + offsets[gl_VertexID]* ParticleSize;
 Transp = clamp(1.0 - VertexAge / ParticleLifetime, 0, 1);
 }
+//TexCoord = texCoords[gl_VertexID] is what leads to the surface animation, without this the program still loads but the texture coordinates are never updated
 TexCoord = texCoords[gl_VertexID];
 gl_Position = Proj * vec4(posCam,1);
 }
 
 void main(){
+// Establishes pos as AnimVertexPosition
 vec4 pos = vec4(AnimVertexPosition,1.0);
+// Establishes u making is equal Freq * pos.x - AnimVelocity * Time
+// u is the frequency * the x of pos - the speed of the moving texture * time
 float u = Freq * pos.x - AnimVelocity * Time;
+// to work out the y position amp and the sin of u is done as an equation 
 pos.y = Amp * sin(u);
+// n equals 0 initially
 vec3 n = vec3(0.0);
+// the x and y of n are a normalised version of the equation (vec2(cos(u),1.0))
 n.xy = normalize(vec2(cos(u), 1.0));
 AnimPosition = ModelViewMatrix * pos;
+// Normal = NormalMartix times n
 Normal = NormalMatrix * n;
+// TexCoord = VertexTexCoord
 TexCoord = VertexTexCoord;
 gl_Position = MVP * pos;
+
 
 if(Pass == 1)
 update();
